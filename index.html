@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .maindiv{
+      width: 50%;
+      margin:auto;
+      position: relative;
+    }
+    .container {
+      display: inline-block;
+      width: 200px;
+      position: relative;
+      top:50px;
+      height: max-content;
+      min-height: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    }
+    .item {
+      width: 80%;
+      height: 80px;
+      background-color: #f1f1f1;
+      border: 1px solid #999;
+      border:none;
+      margin:auto;
+      margin-bottom: 7px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+      cursor: move;
+    }
+    .item.dragging {
+      opacity: 0.5;
+    }
+    #container1 {
+      float: left;
+      background-image: linear-gradient(rgb(219, 203, 203),rgb(152, 152, 142));
+    }
+    #container2 {
+      float: right;
+      background-image: url("drag_drop2.jpg");
+      background-repeat:no-repeat;
+       overflow: hidden;
+      image-rendering: pixelated;
+      background-size:90%;
+      background-position: 5px;
+      /* transition: transform 0.3s ease-in-out; */
+    }
+    #container2 img {
+      margin:auto;
+  width: 150px; /* Make the image fill the container's width */
+  height: 100%; /* Make the image fill the container's height */
+  object-fit: cover; /* Scale the image to cover the entire container without distorting its aspect ratio */
+  object-position: center; /* Position the image at the center of the container */
+}
+    .wave-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 80%;
+      background-color: rgba(0, 0, 255, 0.3);
+      border-radius: 70%;
+      animation: waveAnimation 1s linear;
+      z-index: -1;
+    }
+    @keyframes waveAnimation {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+   #message_container{
+    text-align: center;
+    color:red;
+    position: fixed;
+    bottom:20%;
+    left:44%;
+    font-size: 23px;
+    font-weight: bolder;
+   }
+    #reset_btn {
+      display: block;
+      color:white;
+      background-color: red;
+      padding:10px 20px;
+      border:none;
+      border-radius: 8px;
+      /* margin-top: 20px; */
+      position: fixed;
+      bottom:40px;
+      left:50%;
+       font-weight: bolder;
+    }
+    #reset_btn:hover{
+      cursor: pointer;
+      color:red;
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="maindiv">
+    <div id="container1" class="container" ondrop="drop(event)" ondragover="dragfunc(event)">
+      <div class="item" draggable="true">Item 1</div>
+      <div class="item" draggable="true">Item 2</div>
+      <div class="item" draggable="true">Item 3</div>
+    </div>
+    <div id="message_container"></div>
+    <div id="container2" class="container" ondrop="drop(event)" ondragover="dragfunc(event)"></div>
+  
+    <button id="reset_btn" onclick="resetContainers()">Reset</button>
+  </div>
+
+  <script>
+    var draggedItem = null;
+
+    function dragfunc(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      draggedItem = event.target;
+      draggedItem.classList.add("dragging");
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      draggedItem.classList.remove("dragging");
+      var targetContainer = event.target.closest('.container');
+      targetContainer.appendChild(draggedItem);
+      draggedItem = null;
+      showWaveEffect(targetContainer);
+      showMessage("Item dropped successfully!");
+    }
+
+    function resetContainers() {
+      var container1 = document.getElementById("container1");
+      var container2 = document.getElementById("container2");
+      while (container1.firstChild) {
+        container1.removeChild(container1.firstChild);
+      }
+      while (container2.firstChild) {
+        container2.removeChild(container2.firstChild);
+      }
+
+      var items = ["Item 1", "Item 2", "Item 3"];
+      for (var i = 0; i < items.length; i++) {
+        var item = document.createElement("div");
+        item.className = "item";
+        item.draggable = true;
+        item.textContent = items[i];
+        container1.appendChild(item);
+      }
+
+      attachEventListeners();
+      showMessage("Containers reset successfully!");
+    }
+
+    function attachEventListeners() {
+      var items = document.getElementsByClassName("item");
+      for (var i = 0; i < items.length; i++) {
+        items[i].addEventListener("dragstart", drag);
+      }
+    }
+    function showWaveEffect(container) {
+      var waveEffect = document.createElement("div");
+      waveEffect.className = "wave-effect";
+      container.appendChild(waveEffect);
+
+      setTimeout(function() {
+        container.removeChild(waveEffect);
+      }, 1000);
+    }
+    function showMessage(message) {
+      var messageElement = document.getElementById("message_container")
+      messageElement.textContent = message;
+      setTimeout(function() {
+        document.getElementById("message_container").innerText="";
+      }, 1000);
+    }
+
+    attachEventListeners();
+  </script>
+</body>
+</html>
